@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="redirect_form">
+        <form t-att-action="api_url" method="post">
+            <input type="hidden" name="reference" t-att-value="reference"/>
+        </form>
+    </template>
+
+    <template id="custom_transaction_status" inherit_id="payment.transaction_status">
+        <xpath expr="//div[@id='o_payment_status_alert']" position="inside">
+            <t t-if="tx.provider_id.sudo().code == 'custom'">
+                <div t-if="tx.reference">
+                    <strong>Communication: </strong><span t-esc="tx.reference"/>
+                </div>
+                <div t-if="tx.provider_id.sudo().qr_code">
+                    <t t-set="qr_code" t-value="tx.company_id.sudo().partner_id.bank_ids[:1].build_qr_code_base64(tx.amount, tx.reference, None, tx.currency_id, tx.partner_id)"/>
+                    <div t-if="qr_code" class="mt-2">
+                        <h3>Or scan me with your banking app.</h3>
+                        <img class="border border-dark rounded" t-att-src="qr_code"/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="custom_cart" inherit_id="">
+      <xpath expr="//span[contains(text(), 'Process Checkout')]" position="replace">
+        <span>Process Order</span>
+      </xpath>
+    </template>
+
+    <template id="remove_pay_now_button" inherit_id="account_payment.portal_invoice_page_inherit_payment">
+      <xpath expr="//div[@class='d-grid']" position="replace">
+        <div class="d-grid">
+          <div t-if="tx_ids and not pending_manual_txs and not invoice.amount_residual and invoice.payment_state not in ('paid', 'in_payment')" class="alert alert-info py-1 mb-2" >
+            <i class="fa fa-fw fa-check-circle"/> Pending
+          </div>
+          <div t-if="invoice.payment_state in ('paid', 'in_payment')" class="alert alert-success py-1 mb-2" >
+              <i class="fa fa-fw fa-check-circle"/> Paid
+          </div>
+        </div>
+      </xpath>
+    </template>
+
+    <template id="custom_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+      <xpath expr="//p[@name='order_note']/.." position="replace">
+        <div>
+          <p t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)"
+            id="fiscal_position_remark">
+            <strong>Fiscal Position Remark:</strong>
+            <span t-field="doc.fiscal_position_id.sudo().note"/>
+          </p>
+        </div>
+      </xpath>
+    </template>
+
+    <template id="custom_pricelist_list" inherit_id="website_sale.products">
+      <xpath expr="//t[1]/div[1]/div[2]/div[1]/div[1]/div[1]/t[2]" position="replace">
+      </xpath>
+    </template>
+
+    <template id="custom_mail_notification_layout" inherit_id="mail.mail_notification_layout">
+      <xpath expr="//div[@t-if='subtitles or has_button_access or actions or not is_discussion']/table/tbody" position="replace">
+        <tbody>
+          <tr>
+              <td valign="center">
+                  <img t-att-src="'/logo.png?company=%s' % (company.id or 0)" style="padding: 0px; margin: 0px; height: auto; max-width: 200px; max-height: 36px;" t-att-alt="'%s' % company.name"/>
+              </td>
+          </tr>
+          <tr>
+              <td valign="center">
+                  <hr width="100%"
+                      style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0;margin: 10px 0px;"/>
+                  <p t-if="subtype_internal" style="background-color: #f2dede; padding: 5px; margin-bottom: 16px; font-size: 13px;">
+                      <strong>Internal communication</strong>: Replying will post an internal note. Followers won't receive any email notification.
+                  </p>
+              </td>
+          </tr>
+        </tbody>
+      </xpath>
+
+    </template>
+</odoo>

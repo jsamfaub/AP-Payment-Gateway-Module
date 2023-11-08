@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <template id="place_order_page" inherit_id="website_sale.payment">
+      <xpath expr="//div[@id='payment_method']" position='replace'>
+          <div t-if="providers or tokens" id="payment_method" class="mt-3">
+              <t t-call="payment.checkout">
+                  <t t-set="footer_template_id" t-value="'website_sale.payment_footer'"/>
+                  <t t-set="submit_button_label">Place Order</t>
+              </t>
+          </div>
+      </xpath>
+    </template>
+
+    <template id="order_information_page" inherit_id="website_sale.confirmation">
+      <xpath expr="//h3[1]" position='replace'>
+        <h3 class="text-start mt-3">
+          <strong>Order Information:</strong>
+        </h3>
+      </xpath>
+    </template>
+
+    <!--<template id="cart_page" inherit_id="website_sale.cart">
+      <xpath expr="//span[text()='Process Checkout']" position='replace'>
+        <span>Process Order</span>
+      </xpath>
+    </template>
+
+    <template id="short_cart_summary" inherit_id="website_sale.short_cart_summary">
+      <xpath expr="//span[text()='Proceed to Checkout']" position='replace'>
+        <span>Proceed to Order</span>
+      </xpath>
+    </template>-->
+  </data>
+</odoo>

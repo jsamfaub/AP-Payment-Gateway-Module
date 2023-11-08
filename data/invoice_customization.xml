@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="custom_invoice" inherit_id="account.report_invoice_document">
+    <xpath expr="//div[@class='page'][1]/h2[1]" position="after">
+      <t t-if="print_with_payments">
+        <t t-set="image_data" t-value="context.get('ap_base64_encoded_qrcode')"/>
+        <strong>Pay your order with Stripe! Scan the QR code or follow the link!</strong>
+        <br/>
+        <img t-if="image_data" style="width:150px" t-att-src="'data:image/png;base64,' + image_data" alt="QRCode"/>
+        <br/>
+        <a t-att-href="context.get('ap_payment_link')" t-esc="context.get('ap_payment_link')"></a>
+      </t>
+    </xpath>
+    <xpath expr="//div[@name='payment_term']" position="replace">
+    </xpath>
+    <xpath expr="//div[@name='comment']" position="replace">
+    </xpath>
+  </template>
+</odoo>
